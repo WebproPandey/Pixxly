@@ -1,0 +1,51 @@
+import express from 'express';
+import {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+} from '../controller/User/authController.js';
+import passport from 'passport';
+
+const router = express.Router();
+
+router.post('/register', register);
+router.post('/login', login);
+router.get('/google',passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get('/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/login',
+    session: false,
+  }),
+  (req, res) => {
+    const token = generateToken(req.user);
+
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({
+        message: 'User has logged in successfully via Google',
+        user: {
+          _id: req.user._id,
+          username: req.user.username,
+          email: req.user.email,
+        },
+      });
+  }
+);
+
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+
+export default router;
