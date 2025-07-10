@@ -5,7 +5,8 @@ import express from 'express';
 import passport from 'passport';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import authRoute from './routes/authRoutes.js';
+import authRoute from './routes/user/authRoutes.js';
+import userProfileRoute from './routes/user/userProfileRoute.js';
 import './config/passport.js';
 
 const app = express();
@@ -29,9 +30,8 @@ app.use(passport.session());
 
 // Routes
 app.use('/api/user', authRoute);
+app.use('/api/user', userProfileRoute);
 
-app.use('/', (req, res) => {
-  res.send('Hello World');
-});
+
 
 export default app;

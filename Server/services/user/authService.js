@@ -64,3 +64,33 @@ export const resetPasswordService = async (token, newPassword) => {
 
   return { message: 'Password reset successful. You can now log in.' };
 };
+
+export const deactivateAccountService = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error('User not found');
+
+  user.isActive = false;
+  await user.save();
+
+  return { message: 'Account has been deactivated' };
+};
+
+export const deleteAccountService = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error('User not found');
+
+  await User.deleteOne({ _id: userId });
+
+  return { message: 'Account deleted successfully' };
+};
+
+
+export const togglePrivacyService = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error('User not found');
+
+  user.isPrivate = !user.isPrivate;
+  await user.save();
+
+  return user;
+};

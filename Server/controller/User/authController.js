@@ -8,7 +8,11 @@ import {
   findUserByEmail,
   forgotPasswordService,
   resetPasswordService,
-  validatePassword
+  validatePassword,
+  deleteAccountService,
+  deactivateAccountService,
+  togglePrivacyService
+    
 } from '../../services/user/authService.js';
 import generateToken from '../../utils/generateToken.js';
 
@@ -34,9 +38,14 @@ export const login = async (req, res) => {
 
   const isMatch = await validatePassword(req.body.password, user.password);
   if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+   
+   if (!user.isActive) {
+    user.isActive = true;
+    await user.save(); // Reactivate account
+  }
 
   const token = generateToken(user);
-  res.status(200).json({ token, user });
+  res.status(200).json({ token, user , message: 'Login successful',});
 };
 
 export const forgotPassword = async (req, res) => {
@@ -59,4 +68,34 @@ export const resetPassword = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+export const deactivateAccount = async (req, res) => {
+  try {
+    const { message } = await deactivateAccountService(req.user._id);
+    res.status(200).json({ message });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const { message } = await deleteAccountService(req.user._id);
+    res.clearCookie('token'); // Clear JWT cookie on delete
+    res.status(200).json({ message });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const togglePrivacy = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const updatedUser = await togglePrivacyService(userId);
+    res.status(200).json({ isPrivate: updatedUser.isPrivate });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 

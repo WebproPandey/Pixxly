@@ -4,8 +4,12 @@ import {
   login,
   forgotPassword,
   resetPassword,
-} from '../controller/User/authController.js';
+  deactivateAccount,
+  deleteAccount,
+  togglePrivacy
+} from '../../controller/User/authController.js';
 import passport from 'passport';
+import { protect } from '../../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -47,5 +51,8 @@ router.get('/google/callback',
 
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
+router.post('/deactivate', protect, deactivateAccount);
+router.delete('/delete', protect, deleteAccount);
+router.patch('/toggle-privacy', protect, togglePrivacy);
 
 export default router;
