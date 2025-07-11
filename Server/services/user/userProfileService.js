@@ -7,12 +7,15 @@ export const getUserProfileService = async (userId) => {
   return user;
 };
 
+
+
 export const updateUserProfileService = async (userId, updates) => {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');
 
   user.bio = updates.bio || user.bio;
   user.avatar = updates.avatar || user.avatar;
+  user.avatarPublicId = updates.avatarPublicId || user.avatarPublicId;
 
   await user.save();
   return user;

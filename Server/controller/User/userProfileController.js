@@ -1,5 +1,6 @@
 import {
   getUserProfileService,
+  updateUserProfileService,
   getUserByUsernameService,
   followUserService,
   unfollowUserService,
@@ -7,18 +8,63 @@ import {
   unblockUserService,
 } from '../../services/user/userProfileService.js';
 
+import cloudinary from '../../config/cloudinary.js';
+import User from '../../models/userModel.js';
+
 export const getMyProfile = async (req, res) => {
   const userId = req.user._id;
   const profile = await getUserProfileService(userId);
   res.status(200).json(profile);
 };
 
+
+
 export const updateMyProfile = async (req, res) => {
-  const userId = req.user._id;
-  const { bio, avatar } = req.body;
-  const updated = await updateUserProfileService(userId, { bio, avatar });
-  res.status(200).json(updated);
+  try {
+    const userId = req.user._id;
+    const { bio, avatar: avatarUrl } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    let avatar = user.avatar;
+    let avatarPublicId = user.avatarPublicId;
+
+    // ✅ File upload via Multer + Cloudinary
+    if (req.file) {
+      // 🗑️ Delete old image if exists
+      if (user.avatarPublicId) {
+        await cloudinary.uploader.destroy(user.avatarPublicId);
+      }
+
+      // Save new file info
+      avatar = req.file.path; // Cloudinary image URL
+      avatarPublicId = req.file.filename; // public_id from multer-storage-cloudinary
+    }
+
+    // ✅ Direct image URL (optional)
+    else if (avatarUrl) {
+      if (user.avatarPublicId) {
+        await cloudinary.uploader.destroy(user.avatarPublicId);
+      }
+
+      avatar = avatarUrl;
+      avatarPublicId = ''; // No Cloudinary image, so clear public_id
+    }
+
+    const updatedUser = await updateUserProfileService(userId, {
+      bio,
+      avatar,
+      avatarPublicId,
+    });
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ message: 'Profile update failed' });
+  }
 };
+
 
 export const getUserByUsername = async (req, res) => {
   try {

@@ -16,9 +16,12 @@ const userSchema = new mongoose.Schema(
     isVerified: { type: Boolean, default: false },
     bio: { type: String, default: '' },
     avatar: { type: String, default: '' },
+    avatarPublicId: { type: String, default: '' } ,
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Follow' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Follow' }],
     blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Block' }],
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+   
   },
   { timestamps: true }
 );

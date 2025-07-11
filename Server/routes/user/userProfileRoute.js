@@ -9,12 +9,13 @@ import {
   unblockUser
 } from '../../controller/User/userProfileController.js';
 import {protect} from '../../middleware/authMiddleware.js';
+import upload from '../../middleware/upload/uploadMiddleware.js';
 
 const router = express.Router();
 
 // Own Profile
 router.get('/me', protect, getMyProfile);
-router.put('/me', protect, updateMyProfile);
+router.put('/me', protect, upload.single('avatar'), updateMyProfile);
 
 // View Other User Profile
 router.get('/:username', protect, getUserByUsername);
