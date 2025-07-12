@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import authRoute from './routes/user/authRoutes.js';
 import userProfileRoute from './routes/user/userProfileRoute.js';
 import userPostRoute from './routes/user/postRoutes.js';
+import storyReelsRoute from './routes/user/storyRellsRoute.js';
 import './config/passport.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(passport.session());
 app.use('/api/user', authRoute);
 app.use('/api/user', userProfileRoute);
 app.use('/api/user', userPostRoute);
+app.use('/api/user', storyReelsRoute);
 
 app.use("/" ,(req,res) =>{
   res.send("Hello  ji")

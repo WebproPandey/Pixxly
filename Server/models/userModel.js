@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema(
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Follow' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Follow' }],
     blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Block' }],
-    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
    
   },
   { timestamps: true }

@@ -1,6 +1,8 @@
 import Post from '../../models/postModel.js';
 import User from '../../models/userModel.js';
-import { getMyPosts ,toggleLikeService ,toggleSavePost ,getSavedPosts} from '../../services/user/postService.js';
+import Save from '../../models/saveModel.js';
+
+import { getMyPosts ,toggleLikeService ,toggleSavePost } from '../../services/user/postService.js';
 import { postValidationSchema } from '../../utils/postvalidation.js';
 
 export const createPost = async (req, res) => {
@@ -55,10 +57,7 @@ export const createPost = async (req, res) => {
       caption: req.body.caption || '',
       image: imageData,
       music: musicData,
-      postedBy: {
-      _id: user._id,
-      username: user.username
-     }
+      postedBy:user._id,
     });
 
     res.status(201).json({ message: 'Post created successfully', post });
@@ -67,6 +66,51 @@ export const createPost = async (req, res) => {
   }
 };
 
+
+// controllers/postController.js
+
+// DELETE /api/posts/:postId
+export const deletePostController = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user._id;
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    if (post.postedBy.toString() !== userId.toString()) {
+      return res.status(403).json({ message: 'Unauthorized to delete this post' });
+    }
+
+    await Post.findByIdAndDelete(postId);
+    return res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error deleting post', error: error.message });
+  }
+};
+
+// PUT /api/posts/:postId
+export const updateCaptionController = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { caption } = req.body;
+    const userId = req.user._id;
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    if (post.postedBy.toString() !== userId.toString()) {
+      return res.status(403).json({ message: 'Unauthorized to update this post' });
+    }
+
+    post.caption = caption;
+    await post.save();
+
+    return res.status(200).json({ message: 'Post caption updated', post });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating caption', error: error.message });
+  }
+};
 
 
 
@@ -127,13 +171,26 @@ export const toggleSavePostController = async (req, res) => {
 
 
 
-export const getSavedPostsController = async (req, res) => {
+export const getMySavedPosts = async (req, res) => {
   try {
     const userId = req.user._id;
-    const posts = await getSavedPosts(userId);
-    res.status(200).json({ posts });
+
+    // Populate post details and postedBy user details
+    const savedPosts = await Save.find({ savedBy: userId })
+      .populate({
+        path: 'post',
+        populate: { path: 'postedBy', select: 'username avatar' }
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ savedPosts });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching saved posts', error: error.message });
+    console.error('❌ Error in getMySavedPosts:', error);
+    res.status(500).json({ message: 'Failed to fetch saved posts' });
   }
 };
+
+
+
+
 

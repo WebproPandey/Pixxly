@@ -1,6 +1,7 @@
 import Post from '../../models/postModel.js';
 import Like from '../../models/likeModel.js';
 import Save from '../../models/saveModel.js';
+import mongoose from 'mongoose';
 
 
 
@@ -47,18 +48,4 @@ export const toggleSavePost = async (postId, userId) => {
   }
 };
 
-
-export const getSavedPosts = async (userId) => {
-  const savedPosts = await Save.find({ savedBy: userId })
-    .populate({
-      path: 'post',
-      populate: {
-        path: 'postedBy',
-        select: 'username avatar'
-      }
-    })
-    .sort({ createdAt: -1 });
-
-  return savedPosts.map((entry) => entry.post);
-};
 

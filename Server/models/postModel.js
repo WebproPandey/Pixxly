@@ -13,10 +13,7 @@ const postSchema = new mongoose.Schema(
       url: { type: String },
       public_id: { type: String }
     },
-    postedBy: {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    username: { type: String, required: true }
-    },
+    postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Like' }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
     saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Save' }],
