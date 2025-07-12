@@ -16,7 +16,7 @@ export const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // console.log('🟢 Decoded token:', decoded);
+    console.log('🟢 Decoded token:', decoded);
 
     const user = await User.findById(decoded.id).select('-password');
 
@@ -26,7 +26,7 @@ export const protect = async (req, res, next) => {
     }
 
     req.user = user;
-    // console.log('✅ req.user set to:', req.user);
+    console.log('✅ req.user set to:', req.user);
     next();
   } catch (error) {
     console.error('🔴 JWT Error:', error.message);
