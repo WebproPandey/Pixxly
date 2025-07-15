@@ -9,26 +9,26 @@ import authRoute from './routes/user/authRoutes.js';
 import userProfileRoute from './routes/user/userProfileRoute.js';
 import userPostRoute from './routes/user/postRoutes.js';
 import storyReelsRoute from './routes/user/storyRellsRoute.js';
+import cors from 'cors';
 import './config/passport.js';
 
 const app = express();
 
 // Body Parsers
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Express session (optional for passport)
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'keyboardcat',
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+}));
 
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 app.use('/api/user', authRoute);

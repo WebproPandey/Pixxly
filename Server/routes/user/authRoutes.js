@@ -10,17 +10,13 @@ import {
 } from '../../controller/User/authController.js';
 import passport from 'passport';
 import { protect } from '../../middleware/authMiddleware.js';
+import generateToken from '../../utils/generateToken.js';
 
 const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
 router.get('/google',passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-router.get(
-  '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
 
 router.get('/google/callback',
   passport.authenticate('google', {
@@ -30,22 +26,13 @@ router.get('/google/callback',
   (req, res) => {
     const token = generateToken(req.user);
 
-    res
-      .cookie('token', token, {
+    res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      .status(200)
-      .json({
-        message: 'User has logged in successfully via Google',
-        user: {
-          _id: req.user._id,
-          username: req.user.username,
-          email: req.user.email,
-        },
-      });
+      res.redirect(`${process.env.FRONTEND_URL}/home`);
   }
 );
 

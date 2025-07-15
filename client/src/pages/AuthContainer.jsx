@@ -1,12 +1,14 @@
 // File: components/AuthContainer.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import LoginForm from './Login';
-import RegisterForm from './Register';
+import LoginForm from '../components/Login';
+import RegisterForm from '../components/Register';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
 const AuthContainer = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const cardRef = useRef(null);
+   const cardRef = useRef(null);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     gsap.fromTo(cardRef.current,
@@ -15,9 +17,7 @@ const AuthContainer = () => {
     );
   }, []);
 
-  const handleToggle = () => {
-    setIsLogin(!isLogin);
-  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
@@ -27,11 +27,10 @@ const AuthContainer = () => {
 
         {/* Main Card */}
         <div className="relative bg-gradient-to-br from-white/90 to-purple-100/90 backdrop-blur-lg rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl border border-white/20">
-          {isLogin ? (
-            <LoginForm onSwitch={handleToggle} />
-          ) : (
-            <RegisterForm onSwitch={handleToggle} />
-          )}
+          <Routes>
+            <Route path="login" element={<LoginForm />} />
+            <Route path="register" element={<RegisterForm />} />
+          </Routes>
         </div>
 
         {/* Glow Orbs */}
